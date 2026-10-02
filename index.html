@@ -12,6 +12,18 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Cripta d20">
+<meta name="description" content="Dungeon crawler retro para el celular, con reglas de la quinta edición. Armá un grupo de 4 héroes y bajá a la cripta. Gratis, sin publicidad.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Cripta d20">
+<meta property="og:description" content="Dungeon crawler retro para el celular. Gratis, en el navegador, se instala como app.">
+<meta property="og:url" content="https://cripta-d20.netlify.app/">
+<meta property="og:image" content="https://cripta-d20.netlify.app/social.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cripta d20">
+<meta name="twitter:description" content="Dungeon crawler retro para el celular. Gratis, en el navegador, se instala como app.">
+<meta name="twitter:image" content="https://cripta-d20.netlify.app/social.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Jacquard+12&family=Pirata+One&family=VT323&display=swap" rel="stylesheet">
 <style>
@@ -2598,6 +2610,174 @@ function handArt(kind){const H=HAND[kind],P=H.p.split(' '),c=cnv(H.d[0].length,H
  H.d.forEach((r,j)=>{for(let i=0;i<r.length;i++){if(r[i]==='.')continue;x.fillStyle='#'+P[HCH.indexOf(r[i])];x.fillRect(i,j,1,1)}});return c}
 const ms17=makeSprite;
 makeSprite=function(kind){if(!MON[kind])return ms17(kind);return HAND[kind]?handArt(kind):pixArt(kind)};
+for(const k in SPR)delete SPR[k];
+})();
+/* ---------- Relieve v19: bloques de pared irregulares, con esquinas gastadas, bordes que suben y bajan, volumen por escalones y juntas hundidas.
+   Mantiene la paleta de 9 tonos por piso (sin degradé). Reemplaza stoneTex para las paredes (128 px); piso y techo quedan igual. ---------- */
+(function(){
+const RF=[.16,.28,.42,.58,.76,.93,1.1,1.3,1.55];
+const st0=stoneTex;
+function blockWall(S,seed,base){
+ const c=cnv(S,S),x=c.getContext('2d'),img=x.createImageData(S,S),d=img.data,R=mulberry(seed),P=RF.map(f=>shade(base,f));
+ const K=new Int8Array(S*S).fill(-9),ID=new Int32Array(S*S).fill(-1);
+ const put=(i,k)=>{k=Math.max(0,Math.min(8,k));K[i]=k};
+ // hileras de alto variable que suman S
+ const rows=[];let y=0;while(y<S){let h=26+Math.floor(R()*14);if(S-y-h<24)h=S-y;rows.push([y,h]);y+=h}
+ const H=(a,b)=>{let t=(a*374761393+b*668265263+seed*2654435761)|0;t=(t^(t>>>13))*1274126177|0;return((t^(t>>>16))>>>0)/4294967296};
+ let bid=0;const info=[];
+ rows.forEach(([ry,rh],ri)=>{
+  // ladrillos de ancho variable que cubren la hilera (con vuelta, para que la textura empalme)
+  const off=Math.floor(R()*S);let xx=0;
+  while(xx<S){let w=34+Math.floor(R()*30);if(S-xx-w<26)w=S-xx;
+   const b={x:(xx+off)%S,y:ry,w,h:rh,k:4+(R()<.3?-1:0)+(R()<.2?1:0),tilt:R()<.5?0:(R()<.5?1:-1),cc:[2+Math.floor(R()*5),2+Math.floor(R()*5),2+Math.floor(R()*5),2+Math.floor(R()*5)],crack:R()<.35,id:bid++};
+   info.push(b);xx+=w}});
+ const M=1;   // media junta
+ for(const b of info){
+  for(let ty=0;ty<b.h;ty++)for(let tx=0;tx<b.w;tx++){
+   const px=(b.x+tx)%S,py=b.y+ty,i=py*S+px;
+   // distancia al borde, con esquinas redondeadas/gastadas y bordes que ondulan
+   const L=tx,Rr=b.w-1-tx,T=ty,B=b.h-1-ty;let dd=Math.min(L,Rr,T,B);
+   const cc=L<Rr?(T<B?b.cc[0]:b.cc[3]):(T<B?b.cc[1]:b.cc[2]),ex=Math.min(L,Rr),ey=Math.min(T,B);
+   if(ex<cc&&ey<cc)dd=Math.min(dd,cc-Math.hypot(cc-ex,cc-ey));
+   const wob=(T===dd||B===dd)?Math.floor(H(b.id*7+Math.floor(px/4),py<b.y+b.h/2?1:2)*1.9):Math.floor(H(b.id*7+Math.floor(py/4),px<(b.x+b.w/2)%S?3:4)*1.9);
+   const e=dd-M-wob;ID[i]=b.id;
+   if(e<0){K[i]=-1;continue}                 // junta (se pinta después)
+   let k=b.k;
+   const near=Math.min(L,Rr,T,B),side=near===T?'t':near===L?'l':near===B?'b':'r';
+   if(e<1){k+=side==='t'?3:side==='l'?2:side==='b'?-3:-2}
+   else if(e<3){k+=side==='t'?2:side==='l'?1:side==='b'?-2:-1}
+   else if(e<5){k+=side==='t'?1:side==='b'?-1:0}
+   put(i,k)}}
+ // juntas: oscuras, más todavía justo debajo y a la derecha de cada bloque (sombra del bloque)
+ for(let yy=0;yy<S;yy++)for(let xx=0;xx<S;xx++){const i=yy*S+xx;if(K[i]!==-1)continue;
+  const up=yy>0&&K[i-S]>=0,lf=K[yy*S+(xx+S-1)%S]>=0,up2=yy>1&&K[i-2*S]>=0;
+  K[i]=(up||lf)?0:(up2?1:(H(xx,yy)<.25?2:1))}
+ // grietas y descascarados
+ for(const b of info){
+  if(b.crack){let cx=b.x+4+Math.floor(R()*(b.w-8)),cy=b.y+3,len=6+Math.floor(R()*(b.h-6));
+   for(let n=0;n<len;n++){const i=cy*S+(cx%S);if(K[i]>0&&ID[i]===b.id){K[i]=Math.max(0,K[i]-3);const j=cy*S+((cx+1)%S);if(K[j]>1&&ID[j]===b.id)K[j]=Math.min(8,K[j]+1)}cy++;if(R()<.4)cx+=R()<.5?-1:1;if(cy>=b.y+b.h-2)break}}
+  const chips=Math.floor(R()*3);
+  for(let n=0;n<chips;n++){const top=R()<.5,px=b.x+5+Math.floor(R()*(b.w-10)),py=top?b.y:b.y+b.h-1,r=2.5+R()*1.8;
+   for(let dy=-3;dy<=3;dy++)for(let dx=-3;dx<=3;dx++){const qq=Math.hypot(dx,dy);if(qq>r)continue;const X=(px+dx+S)%S,Y=py+dy;if(Y<b.y||Y>=b.y+b.h)continue;const i=Y*S+X;if(ID[i]!==b.id||K[i]<0)continue;
+    K[i]=qq>r-1.2?(top?b.k-2:b.k+2):-2}}}
+ for(let i=0;i<S*S;i++)if(K[i]===-2)K[i]=1;
+ // moteado de 2x2, como antes
+ for(let n=0;n<S*S/45;n++){const px=Math.floor(R()*S/2)*2,py=Math.floor(R()*S/2)*2,dk=R()<.5?-1:1;
+  for(const[a,b]of[[0,0],[1,0],[0,1],[1,1]]){const i=((py+b)%S)*S+(px+a)%S;if(K[i]>=3)K[i]=Math.max(0,Math.min(8,K[i]+dk))}}
+ for(let i=0;i<S*S;i++){const col=P[Math.max(0,Math.min(8,K[i]))];d[i*4]=col>>16&255;d[i*4+1]=col>>8&255;d[i*4+2]=col&255;d[i*4+3]=255}
+ x.putImageData(img,0,0);return c}
+stoneTex=function(base,seed,o){return o&&o.size===128?blockWall(128,seed,base):st0(base,seed,o)};
+})();
+/* ---------- Luz v19: charcos de luz de antorcha por escalones, sombras al pie de las paredes, monstruos teñidos por la luz del lugar y ojos que brillan en la oscuridad.
+   Todo se calcula en escalones (sin degradé) para mantener el aspecto retro. Reemplaza castFloor, frontFace, sideFace, getSprite y envuelve drawSprite. ---------- */
+(function(){
+const SUB=4,BAND=5;                                   // 4x4 muestras por casillero; la luz de antorcha se redondea a quintos
+const TORCH=[1,.72,.4],GLOWC={lava:[1,.42,.18],vent:[1,.5,.2],demon:[1,.35,.15],runes:[.55,.4,1],candles:[1,.8,.5],mushrooms:[.45,.9,.6]};
+let LM=null,lmKey='',SRC=[];
+const q=v=>Math.ceil(v*BAND-.15)/BAND;                // escalón (un poco generoso para que el charco no quede mezquino)
+function los(ax,ay,bx,by){const dx=bx-ax,dy=by-ay,n=Math.ceil(Math.hypot(dx,dy)*4);for(let i=1;i<n;i++){const x=ax+dx*i/n,y=ay+dy*i/n;if(!isFloor(Math.floor(x),Math.floor(y)))return false}return true}
+const DEC={1:['niche','bones','candles','plaque','cobweb'],2:['tapestry','painting','shield','banner','chains'],3:['vines','web','roots','mushrooms','vines'],4:['drain','algae','pipe','seaweed','chains'],5:['lava','vent','tools','demon','runes']};
+function glowCol(t){const L=DEC[sty(floorN)]||DEC[1];if(t==='torch')return TORCH;if(TEX.glow&&TEX.glow[t]&&L){const name=L[+t.slice(1)];return GLOWC[name]||null}return null}
+function buildLM(){
+ SRC=[];
+ for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){if(!isFloor(x,y))continue;
+  for(let d=0;d<4;d++){const wx=x-DIRS[d][0],wy=y-DIRS[d][1];if(isFloor(wx,wy)||wx<0||wy<0||wx>=MW||wy>=MH)continue;
+   const t=faceKind(wx,wy,d),col=glowCol(t);if(!col)continue;
+   SRC.push({x:x+.5-DIRS[d][0]*.46,y:y+.5-DIRS[d][1]*.46,col,r:t==='torch'?2.25:1.5,I:t==='torch'?1:.7,torch:t==='torch'})}}
+ const W=MW*SUB,H=MH*SUB;LM=new Float32Array(W*H*3);
+ for(let j=0;j<H;j++)for(let i=0;i<W;i++){const cx=Math.floor(i/SUB),cy=Math.floor(j/SUB);if(!isFloor(cx,cy))continue;
+  const px=(i+.5)/SUB,py=(j+.5)/SUB,o=(j*W+i)*3;
+  for(const s of SRC){const dd=Math.hypot(px-s.x,py-s.y);if(dd>=s.r)continue;if(!los(s.x,s.y,px,py))continue;
+   const v=q(s.I*Math.pow(1-dd/s.r,.8));for(let c=0;c<3;c++)LM[o+c]=Math.max(LM[o+c],v*s.col[c])}}
+}
+function ensure(){const key=floorN+':'+(map&&map.length)+':'+rooms.length+':'+(rooms[0]&&rooms[0].x)+','+(rooms[0]&&rooms[0].y);if(key!==lmKey||!LM){lmKey=key;buildLM()}}
+window.lightRebuild=()=>{lmKey=""};
+// Luz de antorcha en un punto del mundo (sin la del grupo). tf: parpadeo de las antorchas.
+let tf=1;
+function tl(wx,wy,out){const i=Math.floor(wx*SUB),j=Math.floor(wy*SUB);if(i<0||j<0||i>=MW*SUB||j>=MH*SUB){out[0]=out[1]=out[2]=0;return out}
+ const o=(j*MW*SUB+i)*3;out[0]=LM[o]*tf;out[1]=LM[o+1]*tf;out[2]=LM[o+2]*tf;return out}
+// Mezcla: la luz del grupo (algo fría) más la de las antorchas (cálida), con tope.
+// Mezcla: se parte de la luz de siempre (la del grupo) y se le SUMA la de las antorchas, sin cambiar el color base de la piedra.
+const GAIN=.8;
+const AMB=.84;   // fuera del alcance de las antorchas todo queda un poco más oscuro que antes, para que los charcos de luz resalten
+function mix(kp,t,out){let m=0;kp*=AMB;for(let c=0;c<3;c++){out[c]=kp+t[c]*GAIN;m=Math.max(m,out[c])}if(m>1.25)for(let c=0;c<3;c++)out[c]*=1.25/m;return out}
+const T3=[0,0,0],M3=[0,0,0];
+// Piso y techo
+const lp=z=>light(z);
+castFloor=function(){
+ ensure();tf=.93+Math.sin(time*7.1)*.04+Math.sin(time*17.3)*.03;
+ if(!fbuf){fbuf=vctx.createImageData(VW,VH);f32=new Uint32Array(fbuf.data.buffer)}
+ const[fx_,fy]=DIRS[pos.d],[rx,ry]=DIRS[(pos.d+1)%4],cx0=pos.x+.5,cy0=pos.y+.5,FT=TEX.f32,CT=TEX.c32;
+ f32.fill(0xff000000);
+ for(let y=VH/2;y<VH;y++){const z=.5*F/(y-VH/2+.5);if(z>7.5)continue;const zz=z-.9,row=y*VW,crow=(VH-1-y)*VW,kp=light(z-.1);
+  for(let x=0;x<VW;x++){const lat=(x-VW/2+.5)*z/F,wx=cx0+fx_*zz+rx*lat,wy=cy0+fy*zz+ry*lat,cx=Math.floor(wx),cy=Math.floor(wy),ox=wx-cx,oy=wy-cy,ti=((oy*64)|0)*64+((ox*64)|0);
+   mix(kp,tl(wx,wy,T3),M3);if(M3[0]+M3[1]+M3[2]<.02)continue;
+   // sombra al pie de las paredes: una franja más oscura, en dos escalones
+   let sh=1;const e=.1;
+   if(ox<e&&!isFloor(cx-1,cy)||ox>1-e&&!isFloor(cx+1,cy)||oy<e&&!isFloor(cx,cy-1)||oy>1-e&&!isFloor(cx,cy+1))sh=.5;
+   else if(ox<2*e&&!isFloor(cx-1,cy)||ox>1-2*e&&!isFloor(cx+1,cy)||oy<2*e&&!isFloor(cx,cy-1)||oy>1-2*e&&!isFloor(cx,cy+1))sh=.75;
+   let p=FT[ti],r=M3[0]*sh,gg=M3[1]*sh,b=M3[2]*sh;
+   f32[row+x]=0xff000000|(Math.min(255,(p>>16&255)*b)<<16)|(Math.min(255,(p>>8&255)*gg)<<8)|Math.min(255,(p&255)*r);
+   p=CT[ti];const kc=.85*(sh<1?.8:1);
+   f32[crow+x]=0xff000000|(Math.min(255,(p>>16&255)*M3[2]*kc)<<16)|(Math.min(255,(p>>8&255)*M3[1]*kc)<<8)|Math.min(255,(p&255)*M3[0]*kc)}}
+ fctx.putImageData(fbuf,0,0);g.drawImage(fcv,0,0);
+};
+function shade(x,y,w,h,k,t){                 // k: luz de siempre; t: luz de antorcha (color)
+ const tm0=Math.max(t[0],t[1],t[2]);k*=AMB+(1-AMB)*Math.min(1,tm0*2);
+ if(k<.995){g.fillStyle=`rgba(0,0,0,${(1-Math.max(0,k)).toFixed(3)})`;g.fillRect(x,y,w,h)}
+ const tm=Math.max(t[0],t[1],t[2]);if(tm<.05)return;
+ const r=Math.round(t[0]/tm*255),gg=Math.round(t[1]/tm*255),b=Math.round(t[2]/tm*255);
+ g.globalCompositeOperation='soft-light';g.globalAlpha=Math.min(.85,tm*.8);g.fillStyle=`rgb(${r},${gg},${b})`;g.fillRect(x,y,w,h);
+ g.globalCompositeOperation='screen';g.globalAlpha=Math.min(.35,tm*.22*(1-k*.5));g.fillRect(x,y,w,h);
+ g.globalAlpha=1;g.globalCompositeOperation='source-over'}
+const lit=t=>t==='torch'||(TEX.glow&&TEX.glow[t]);
+// Pared de enfrente: 8 franjas verticales, cada una con la luz del piso que tiene delante.
+frontFace=function(c,zn,w){
+ const[x1,y1]=P(c-.5,-.5,zn),[x2,y2]=P(c+.5,.5,zn);const fd=(pos.d+2)%4,t=faceKind(w.x,w.y,fd);
+ const X1=Math.round(x1),Y1=Math.round(y1),Wd=Math.round(x2)-X1,Hd=Math.round(y2)-Y1;
+ g.drawImage(getTex(t),0,0,128,128,X1,Y1,Wd,Hd);
+ {const kp=faceK(zn,t),[rx,ry]=DIRS[(pos.d+1)%4],fx=w.x+.5+DIRS[fd][0]*.55,fy=w.y+.5+DIRS[fd][1]*.55;
+  const NS=8;for(let s=0;s<NS;s++){const a=Math.round(X1+Wd*s/NS),b=Math.round(X1+Wd*(s+1)/NS),u=(s+.5)/NS-.5;
+   shade(a,Y1,b-a,Hd,kp,tl(fx+rx*u,fy+ry*u,T3))}}
+ g.strokeStyle='rgba(0,0,0,.85)';g.lineWidth=1;g.strokeRect(X1+.5,Y1+.5,Wd-1,Hd-1);
+};
+// Paredes de los costados: columna por columna, con la luz del piso pegado a la pared a esa profundidad.
+sideFace=function(c,zn,zf,w){
+ const X=c<0?c+.5:c-.5,fd=c<0?(pos.d+1)%4:(pos.d+3)%4,t=faceKind(w.x,w.y,fd),tex=getTex(t);
+ const sa=VW/2+X/zn*F,sb=VW/2+X/zf*F,s0=Math.max(0,Math.floor(Math.min(sa,sb))),s1=Math.min(VW,Math.ceil(Math.max(sa,sb)));
+ const[f0,f1]=DIRS[pos.d],[rx,ry]=DIRS[(pos.d+1)%4],L=lit(t);
+ for(let sx=s0;sx<s1;sx++){const dx=sx+.5-VW/2;if(Math.abs(dx)<.01)continue;const z=X*F/dx;if(z<zn-.001||z>zf+.001)continue;
+  let u=z-zn;if(c>0)u=1-u;const tu=Math.max(0,Math.min(127,Math.floor(u*128))),h=F/z,top=Math.round(VH/2-.5*h),hh=Math.round(h);
+  g.drawImage(tex,tu,0,1,128,sx,top,1,hh);
+  {const zz=z-.9,lat=X-(c<0?-.06:.06),wx=pos.x+.5+f0*zz+rx*lat,wy=pos.y+.5+f1*zz+ry*lat;
+   shade(sx,top,1,hh,faceK(Math.sqrt(z*z+X*X*.55),t)*.8,tl(wx,wy,T3))}}
+ const X2=X;g.strokeStyle='rgba(0,0,0,.85)';g.lineWidth=1;g.beginPath();for(const[z,sx]of[[zn,sa],[zf,sb]]){const h=F/z;const xx=Math.round(sx)+.5;g.moveTo(xx,VH/2-.5*h);g.lineTo(xx,VH/2+.5*h)}g.stroke();
+};
+// Sprites: oscurecidos por escalón, teñidos con el color de la luz del lugar, y los píxeles que brillan (ojos, fuego, gemas) siempre a pleno.
+const EM={};
+function emissive(kind,base){if(EM[kind]!==undefined)return EM[kind];const W=base.width,H=base.height,d=base.getContext('2d').getImageData(0,0,W,H).data;
+ const c=cnv(W,H),x=c.getContext('2d'),im=x.createImageData(W,H),o=im.data;let n=0;
+ for(let i=0;i<W*H;i++){const r=d[i*4],gg=d[i*4+1],b=d[i*4+2],a=d[i*4+3];if(a<200)continue;const mx=Math.max(r,gg,b),mn=Math.min(r,gg,b);
+  if(mx>=225&&mx-mn>=120){o[i*4]=r;o[i*4+1]=gg;o[i*4+2]=b;o[i*4+3]=255;n++}}
+ x.putImageData(im,0,0);return EM[kind]=(n>0&&n<W*H*.08)?c:null}
+let CUR=null;
+getSprite=function(kind,k,flash){
+ const col=CUR||[k,k,k],lv=Math.max(col[0],col[1],col[2]),li=Math.max(0,Math.min(8,Math.round((1-Math.min(1,lv))*8))),
+  warm=col[2]<col[0]*.8?(col[2]<col[0]*.55?2:1):0,key=kind+(flash?'F':'L'+li+'w'+warm);
+ if(SPR[key])return SPR[key];const base=SPR[kind]||(SPR[kind]=makeSprite(kind)),BW=base.width,BH=base.height,c=cnv(BW,BH),x=c.getContext('2d');x.drawImage(base,0,0);
+ x.globalCompositeOperation='source-atop';
+ if(flash){x.fillStyle='rgba(255,255,255,.85)';x.fillRect(0,0,BW,BH)}
+ else{const f=1-li/8*.93;x.fillStyle=`rgba(0,0,0,${(1-f).toFixed(3)})`;x.fillRect(0,0,BW,BH);
+  if(warm){x.globalCompositeOperation='soft-light';x.fillStyle=warm===2?'rgb(255,150,70)':'rgb(255,190,120)';x.fillRect(0,0,BW,BH);
+   x.globalCompositeOperation='destination-in';x.drawImage(base,0,0)}
+  x.globalCompositeOperation='source-over';const em=MON[kind]&&emissive(kind,base);if(em&&li>=2)x.drawImage(em,0,0)}
+ return SPR[key]=c};
+const dsPrev=drawSprite;
+drawSprite=function(kind,cx,by,s,k,flash,sw){
+ const zc=F/s,cc=(cx-VW/2)/s,zz=zc-.9,[f0,f1]=DIRS[pos.d],[rx,ry]=DIRS[(pos.d+1)%4],wx=pos.x+.5+f0*zz+rx*cc,wy=pos.y+.5+f1*zz+ry*cc;
+ const m=mix(k,tl(wx,wy,T3),[0,0,0]);
+ if(k>=.89&&!MON[kind])for(let i=0;i<3;i++)m[i]=Math.max(m[i],k);   // altares y objetos que brillan solos
+ CUR=m;dsPrev(kind,cx,by,s,Math.max(m[0],m[1],m[2]),flash,sw);CUR=null};
 for(const k in SPR)delete SPR[k];
 })();
 initDemo();refreshTitle();$('#bAuto').classList.toggle('on',settings.auto);$('#bAuto').textContent=settings.auto?'Auto: sí':'Auto: no';requestAnimationFrame(loop);
