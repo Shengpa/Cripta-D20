@@ -4,7 +4,7 @@ Juego para celular (Android y iPhone) estilo dungeon crawler retro en primera pe
 
 ## Cómo trabajamos (leer primero)
 - **Los pendientes son los issues de GitHub** de este repo. Al empezar, mirá los issues abiertos (`curl -sS https://api.github.com/repos/Shengpa/cripta-d20/issues`) y trabajá en el que pida Chelo.
-- **Una rama por issue** (`issue-N-descripcion`). Al terminar: probar, subir la rama, abrir un PR que diga `Closes #N`, mergearlo y borrar la rama. La API de GitHub funciona con `curl` sin token (la sesión ya está autenticada).
+- **Una rama por issue** (`issue-N-descripcion`). Al terminar: probar, subir la rama, abrir un PR que diga `Closes #N` y mergearlo (`PUT /pulls/N/merge`). La API de GitHub funciona con `curl` sin token y con el encabezado `Content-Type: application/json` (la sesión ya está autenticada). Borrar ramas no está permitido desde acá: quedan en GitHub y Chelo las puede borrar.
 - **Antes de mergear:** subir `VERSION` en `sw.js` (`cripta-d20-vNN`) y correr `python3 tools/prueba.py`. Para cambios visuales, correr `python3 tools/prueba.py --capturas` y mirar las capturas.
 - **A Chelo le gusta ver imágenes antes de que se cambie el juego** cuando el cambio es de estilo: primero una muestra (antes y después), después el cambio.
 - **No leer `index.html` entero** (son unas 2800 líneas). Buscar con `grep -n` la función que hace falta y leer solo esa parte.
