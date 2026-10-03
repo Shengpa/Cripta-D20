@@ -2493,44 +2493,46 @@ const HAND={
   '........aFFGGa..aFFGGa........',
   '........aFGGHIaaFGGHIa........',
   '.........aaaaa..aaaaa.........']},
- skeleton:{p:'140a08 9a9086 4c4640 8a4a22 d4a838 6e665c 2e2a26 fff8e4 e0d6bc b0a488 ff3a20 766a54 6e4a22 9a6a34 d8d0c0 30200c 4e3216',d:[
-  '...........aaaaaa.........',
-  '..........abbbbcca........',
-  '.........abcdbcebfa.......',
-  '........abbffcccgcga......',
-  '........ahhhihhjjjja......',
-  '........aiaaahjaaaia......',
-  '........aiakahjakaia......',
-  '........aiaaailaaaia......',
-  '........aihiiaahhila......',
-  '.........ahhiihjjla.......',
-  '....a....ajaiaiaiaa.......',
-  '...ama....ahihijla........',
-  '..anoa.aaaaaahjaaaaaa.....',
-  '..amoaahhhhhhiihiijlja....',
-  '.anpoahjaahhiiijjlaahia...',
-  '.amaoahjaaaaahjaaaaahja...',
-  '.amaoahjahhhiiijjjlahja...',
-  '.amaoahjaaaaahjaaaaahja...',
-  '.amaoahjahhhiiijjjlahja...',
-  '.amaoahjaaaaahjaaaaahja...',
-  '.amaoahjaahhiiijjlaahja...',
-  '.amaoahja.aaahjaaa.ahja...',
-  '.amahhjjaaaaahjaaaaahiia..',
-  '.amahillahhhiiijiijaiija..',
-  '.amaoaaaahijailahijaaja...',
-  '.amaoa..aiijaaaahila.a....',
-  '.amaoa...ahja..ahja.......',
-  '.amaoa...ahja..ahja.......',
-  '.amaoa...ahja..ahja.......',
-  '.ammoa...ahja..ahja.......',
-  '..amoa..ahija..ahija......',
-  '..aqoa...ahja..ahja.......',
-  '...ama...ahja..ahja.......',
-  '....a....ahja..ahja.......',
-  '........aahja..ahjaa......',
-  '.......ahilla..aijjja.....',
-  '........aaaa....aaaa......']},
+ skeleton:{p:'140a08 f4ecd4 c8bc9c 8e8268 5a5244 f4dcff a854ff 1a1018 8a6a40 5e4628 3a2a18 b8b8c0 6e7078 3e4048 dcd2b4 eef2f6 a0aab4 6e4a22 d4a838 8a6a20',d:[
+  '.....apa..............................',
+  '....apqa......aaaaaaaa................',
+  '....apqna....abbbccccca...............',
+  '....apqna...abbbbcccccda..............',
+  '....apqna...abbbbcccccda..............',
+  '....apqna..abbbbbcccccdda.............',
+  '....apqna..abbhghcchghdda.............',
+  '....apqna..abbgfgccgfgdda.............',
+  '....apqna..abbhhhcchhhdda.............',
+  '....apqna..abbbbbhhcccdda.............',
+  '....apqna...abbbbcccccda..............',
+  '....apqna...abccccccccda..............',
+  '....apqna....abhbhbhbha...............',
+  '....apqna..aaaaddddddaaaa.............',
+  '....apqna.abbbbbbcdcccccca............',
+  '....apqnaaccbbccccdcccdddda...........',
+  '...aapqnaaccaaaaacdaaaaaddaaaaa.......',
+  '..atssssstccbbccccdcccdddblllllaa.....',
+  '...aarraaabdaaaaacdaaaaallliiillla....',
+  '...abccdaabdbbbcccdccddlliiiiijjlma...',
+  '...abccdaabdaaaaacdaaalliiiiijjjjmma..',
+  '....asbdaabdbbbcccdccdliiiooooojjjma..',
+  '.....abdabbdaaaaacdaalliiooooooojjmma.',
+  '.....abdabdaabbcccdccliiiokoookojjkna.',
+  '.....abbbbda.aaaacdaaliiiokokokojkkna.',
+  '......aabcda..aaacdaaliijoooooookkkna.',
+  '........aaa..abbbcccdlljjjoojookkknna.',
+  '.............abbbhhcddljjjojojokkkna..',
+  '.............abcdaabcdlljjjjjkkkknna..',
+  '.............abcdaabcdammjjjkkkknna...',
+  '.............abcdaabcdaammmkkknnna....',
+  '.............abcdaabcda.aamnnnnaa.....',
+  '.............abcdaabcda...aaaaa.......',
+  '.............abcdaabcda...............',
+  '.............abcdaabcda...............',
+  '.............abcdaabcda...............',
+  '.............abcdaabcdaa..............',
+  '............abbccdabbccda.............',
+  '.............aaaaa.aaaaa..............']},
  wolf:{p:'140a08 aca296 5e5650 847a70 6a3a3a 3c3632 ffe040 fff8b0 e4dccc bcb2a2 948a7c 6a6058 3a0e0a f4f0dc 6e665e 524a44 28221e',d:[
   '.........a..........a...........',
   '........aba........aba..........',
@@ -2778,6 +2780,46 @@ drawSprite=function(kind,cx,by,s,k,flash,sw){
  const m=mix(k,tl(wx,wy,T3),[0,0,0]);
  if(k>=.89&&!MON[kind])for(let i=0;i<3;i++)m[i]=Math.max(m[i],k);   // altares y objetos que brillan solos
  CUR=m;dsPrev(kind,cx,by,s,Math.max(m[0],m[1],m[2]),flash,sw);CUR=null};
+for(const k in SPR)delete SPR[k];
+})();
+// Referencia de estilo nueva (v20, issue #10): esqueleto redibujado con espada y escudo con calavera pintada,
+// color de acento violeta en los ojos de los no muertos con su resplandor en escalones, y filo de luz de antorcha arriba a la izquierda.
+(function(){
+const UND=new Set(['skeleton','zombie','ghoul','ghast','wight','wightB','wightKing','mummy','specter','wraith','banshee','vampspawn','necro','necroB','shadow']);
+const VI=[244,220,255],VM=[168,84,255],VD=[96,36,150];
+const ACC={};   // píxeles de acento por monstruo: siempre a pleno, aunque esté oscuro
+const ms=makeSprite;
+makeSprite=function(kind){const c=ms(kind);return MON[kind]?ref10(kind,c):c};
+function ref10(kind,c){
+ const W=c.width,H=c.height,x=c.getContext('2d'),im=x.getImageData(0,0,W,H),d=im.data,N=W*H;
+ const op=i=>d[i*4+3]===255,out=i=>op(i)&&d[i*4]<44&&d[i*4+1]<34&&d[i*4+2]<38;
+ const em=new Uint8Array(N),und=UND.has(kind);let n=0;
+ for(let i=0;i<N;i++){if(!op(i))continue;const r=d[i*4],g=d[i*4+1],b=d[i*4+2],mx=Math.max(r,g,b),mn=Math.min(r,g,b);
+  if(und&&g>r*.55&&b<g*.6&&r>150)continue;if((mx>=225&&mx-mn>=120)||(und&&mx>=170&&mx-mn>=mx*.42&&!(r>g&&r>b&&g<90)&&!(g>r*.55&&b<g*.6))||(r===VM[0]&&g===VM[1]&&b===VM[2])||(r===VI[0]&&g===VI[1]&&b===VI[2])){em[i]=1;n++}}
+ if(n>N*.08){n=0;em.fill(0)}
+ const acc=new Uint8Array(N);
+ // filo de luz: el primer píxel del cuerpo arriba o a la izquierda del contorno sube un tono
+ const src=new Uint8ClampedArray(d);
+ for(let j=0;j<H;j++)for(let i=0;i<W;i++){const p=j*W+i;if(!op(p)||out(p)||em[p])continue;
+  const up=j>0?j*W-W+i:-1,lf=i>0?p-1:-1;const edgeUp=up<0||!op(up)||out(up),edgeLf=lf<0||!op(lf)||out(lf);
+  if(edgeUp&&(edgeLf||j>0)){if(!edgeUp)continue;for(let k=0;k<3;k++)d[p*4+k]=Math.min(255,Math.round(src[p*4+k]*1.12+10))}}
+ if(n){for(let j=0;j<H;j++)for(let i=0;i<W;i++){const p=j*W+i;if(!em[p])continue;acc[p]=1;
+   if(und){let inner=0;for(const[a,b]of[[1,0],[-1,0],[0,1],[0,-1]]){const q=(j+b)*W+i+a;if(i+a>=0&&i+a<W&&j+b>=0&&j+b<H&&em[q])inner++}
+    const T=inner>=3?VI:VM;d[p*4]=T[0];d[p*4+1]=T[1];d[p*4+2]=T[2]}
+   const T=und?VM:[src[p*4],src[p*4+1],src[p*4+2]];
+   for(const[a,b]of[[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]]){const diag=a&&b;const ii=i+a,jj=j+b;if(ii<0||jj<0||ii>=W||jj>=H)continue;const q=jj*W+ii;if(em[q]||!op(q))continue;
+    if(out(q)){const k=.55;for(let t=0;t<3;t++)d[q*4+t]=Math.round(src[q*4+t]*(1-k)+T[t]*.62*k);acc[q]=2}
+    else if(!acc[q]&&!diag&&d[q*4]*.3+d[q*4+1]*.59+d[q*4+2]*.11<110){for(let t=0;t<3;t++)d[q*4+t]=Math.round(d[q*4+t]*.75+T[t]*.25);acc[q]=2}}}}
+ x.putImageData(im,0,0);
+ // máscara de acento (para que brille en la oscuridad)
+ const m=cnv(W,H),mx=m.getContext('2d'),mi=mx.createImageData(W,H);let any=0;
+ for(let p=0;p<N;p++)if(acc[p]===1){for(let t=0;t<4;t++)mi.data[p*4+t]=d[p*4+t];any=1}
+ mx.putImageData(mi,0,0);ACC[kind]=any?m:null;return c}
+window.ACC=ACC;
+// El acento se dibuja encima con su color pleno aunque el monstruo esté en penumbra.
+const gs=getSprite;
+getSprite=function(kind,k,flash){const key='A'+kind+(flash?'F':'')+Math.round(k*16);if(SPR[key])return SPR[key];
+ const c0=gs(kind,k,flash);if(flash||!ACC[kind])return SPR[key]=c0;const c=cnv(c0.width,c0.height),x=c.getContext('2d');x.drawImage(c0,0,0);x.drawImage(ACC[kind],0,0);return SPR[key]=c};
 for(const k in SPR)delete SPR[k];
 })();
 initDemo();refreshTitle();$('#bAuto').classList.toggle('on',settings.auto);$('#bAuto').textContent=settings.auto?'Auto: sí':'Auto: no';requestAnimationFrame(loop);

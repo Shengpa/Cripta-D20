@@ -25,10 +25,12 @@ El script tiene el juego base y, al final, secciones que **reemplazan funciones 
 - **v17:** tamaños reales (`HGT`, `monFrac`, `spriteTop`) y lienzo de 720×480 (`VS=3`) dibujando en coordenadas de 240×160.
 - **v18 (monstruos en pixel art grueso):** `pixArt` rasteriza `spriteArt` con 4 tonos en bloques (`band`, `edge`); `HAND` tiene goblin, esqueleto, lobo y ogro dibujados a mano; `OVR` tiene dibujos rehechos.
 - **v19 (relieve y luces):** `blockWall` (piedras irregulares con relieve, solo paredes); `buildLM` (mapa de luz de antorchas y decoraciones brillantes, 4×4 por casillero, en escalones), `mix`, `shade`, `castFloor`/`frontFace`/`sideFace`/`getSprite`/`drawSprite` nuevos y ojos que brillan (`emissive`).
+- **v20 (issue #10, color de acento):** `HAND.skeleton` redibujado con espada y escudo con calavera pintada; sección final que envuelve `makeSprite` (`ref10`): ojos de los no muertos (`UND`) en violeta con resplandor en escalones, filo de luz de un tono arriba de cada monstruo, y `ACC` (píxeles de acento que se dibujan a pleno en `getSprite` aunque haya poca luz).
 - Para probar en la consola: `startGame()`, `genFloor(n)`, `spawn(clave,x,y)` en las casillas de `cellAt(distancia,carril)`, `act('f'|'b'|'tl'|'tr'|'sl'|'sr')`, `setAuto(true)`.
 
 ## Estilo: lo que le gusta y lo que no
 - **Le gusta:** pixel art grueso con pocos píxeles, bordes nítidos, contorno negro, 3 o 4 tonos en bloques, luz por escalones (sin degradé), aire de fines de los 80 y principios de los 90, tamaños proporcionados por altura real, luz cálida de antorchas sumada encima de la luz de siempre, piedras irregulares con relieve.
+- **Referencia de la publicidad (issue #10):** le gustaron el violeta como color de acento (ojos de no muertos, magia) y el esqueleto con espada y escudo con calavera. También le llama la atención la vista más vertical y cercana del video de esa publicidad (ver el issue nuevo).
 - **No le gusta (no repetir):** sombreado suave o "de plastilina" (óvalos y tubos con 8 tonos y tramado); planos angulosos tipo low poly; versiones con muchos más píxeles por monstruo; paquetes de arte ya hechos (prefiere los dibujos propios); luz que cambia el color base de la piedra (tinte frío, filtro sepia); abombado ovalado en el centro de los bloques.
 
 ## Juego base (resumen)
