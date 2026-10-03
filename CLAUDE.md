@@ -30,7 +30,7 @@ El script tiene el juego base y, al final, secciones que **reemplazan funciones 
 
 ## Estilo: lo que le gusta y lo que no
 - **Le gusta:** pixel art grueso con pocos píxeles, bordes nítidos, contorno negro, 3 o 4 tonos en bloques, luz por escalones (sin degradé), aire de fines de los 80 y principios de los 90, tamaños proporcionados por altura real, luz cálida de antorchas sumada encima de la luz de siempre, piedras irregulares con relieve.
-- **Referencia de la publicidad (issue #10):** le gustaron el violeta como color de acento (ojos de no muertos, magia) y el esqueleto con espada y escudo con calavera. También le llama la atención la vista más vertical y cercana del video de esa publicidad (ver el issue nuevo).
+- **Referencia de la publicidad (issue #10):** le gustaron el violeta como color de acento (ojos de no muertos, magia) y el esqueleto con espada y escudo con calavera. Se probó una vista vertical de un solo héroe con manos en primera persona y monstruos mucho más detallados (issue #12, borradores en la rama `issue-12-arte-nuevo`): no lo terminaron de convencer y se dejó el juego como estaba.
 - **No le gusta (no repetir):** sombreado suave o "de plastilina" (óvalos y tubos con 8 tonos y tramado); planos angulosos tipo low poly; versiones con muchos más píxeles por monstruo; paquetes de arte ya hechos (prefiere los dibujos propios); luz que cambia el color base de la piedra (tinte frío, filtro sepia); abombado ovalado en el centro de los bloques.
 
 ## Juego base (resumen)
